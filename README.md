@@ -1,1 +1,1 @@
-# maze_solver_python
+# Maze Solver in Python
