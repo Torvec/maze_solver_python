@@ -25,12 +25,10 @@ class Window:
     def close(self):
         self.__running = False
 
-
 class Point:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-
 
 class Line:
     def __init__(self, p1, p2):
@@ -40,7 +38,6 @@ class Line:
     def draw(self, canvas, fill_color="black"):
         canvas.create_line(self.p1.x, self.p1.y, self.p2.x, self.p2.y, fill=fill_color, width=2)
 
-
 class Cell:
     def __init__(self, win):
         self.has_left_wall = True
@@ -48,12 +45,14 @@ class Cell:
         self.has_top_wall = True
         self.has_btm_wall = True
         self._x1 = None
-        self._x2 = None
         self._y1 = None
+        self._x2 = None
         self._y2 = None
         self._win = win
 
     def draw(self, x1, y1, x2, y2):
+        if self._win is None:
+            return
         self._x1 = x1
         self._y1 = y1
         self._x2 = x2
@@ -71,25 +70,32 @@ class Cell:
             line = Line(Point(x1, y2), Point(x2, y2))
             self._win.draw_line(line)
 
+    def draw_move(self, to_cell, undo=False):
+        origin_center_x = (self._x1 + self._x2) // 2
+        origin_center_y = (self._y1 + self._y2) // 2
+        dest_center_x = (to_cell._x1 + to_cell._x2) // 2
+        dest_center_y = (to_cell._y1 + to_cell._y2) // 2
+        
+        fill_color = "red"
+        if undo:
+            fill_color = "gray"
+        
+        line = Line(Point(origin_center_x, origin_center_y), Point(dest_center_x, dest_center_y))
+        self._win.draw_line(line, fill_color)
 
 def main():
     win = Window(800, 600)
+
+    c1 = Cell(win)
+    c2 = Cell(win)
+    c3 = Cell(win)
+    c1.draw(300, 300, 400, 400)
+    c2.draw(450, 300, 550, 400)
+    c3.draw(200, 200, 300, 300)
+    c1.draw_move(c2)
+    c2.draw_move(c3)
+    c1.draw_move(c3)
     
-    c = Cell(win)
-    c.has_left_wall = False
-    c.draw(50, 50, 100, 100)
-
-    c = Cell(win)
-    c.has_right_wall = False
-    c.draw(125, 125, 200, 200)
-
-    c = Cell(win)
-    c.has_btm_wall = False
-    c.draw(225, 225, 250, 250)
-
-    c = Cell(win)
-    c.has_top_wall = False
-    c.draw(300, 300, 500, 500)
     win.wait_for_close()
 
 if __name__ == '__main__':
